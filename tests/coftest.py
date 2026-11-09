@@ -21,7 +21,7 @@ def _estado_inicial():
     
     
     @pytest.fixture
-    def _client():
+    def client():
         """Fixture para criar um cliente de teste do FastAPI."""
         with TestClient(app) as c:
             yield c
@@ -29,8 +29,8 @@ def _estado_inicial():
             
             
 @pytest.fixture
-def _login(_client: TestClient, usuario:str) -> dict:
-    resp = _client.post(
+def _login(client: TestClient, usuario:str) -> dict:
+    resp = client.post(
         "/auth/login",
         data = {"username": usuario, "password": senhas[usuario]},
     )
@@ -40,13 +40,13 @@ def _login(_client: TestClient, usuario:str) -> dict:
 
 
 @pytest.fixture
-def headers_admin(_client):
-    return _login(_client, "admin")
+def headers_admin(client):
+    return _login(client, "admin")
 
 
 @pytest.fixture
-def headers_client(_client):
-    return _login(_client, "cliente")
+def headers_client(client):
+    return _login(client, "cliente")
 
 
 @pytest.fixture
@@ -68,11 +68,11 @@ def novo_cupom():
 
 
 @pytest.fixture
-def cadastrar(_client, headers_admin, novo_cupom):
+def cadastrar(client, headers_admin, novo_cupom):
     """Fixture para cadastrar um cupom e retornar o cupom cadastrado."""
     
     def _cadastrar(**campos) -> dict:
-        resp = _client.post("/cupons", json=novo_cupom(**campos), headers=headers_admin)
+        resp = client.post("/cupons", json=novo_cupom(**campos), headers=headers_admin)
         assert resp.status_code == 201, f"Falha ao cadastrar cupom: {resp.text}"
         return resp.json()
     

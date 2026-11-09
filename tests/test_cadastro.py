@@ -91,7 +91,7 @@ def test_cenario5_percentual_75_rejeitado(
     assert client.get("/cupons/SUPER75").status_code == 404
     
     
-@pytest.mak.parametrize(
+@pytest.mark.parametrize(
     "percentual", [0, 1, 49, 50])
 @pytest.mark.negativo
 def test_percentual_fora_da_faixa_rejeitado(
