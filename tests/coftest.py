@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-from dados import CUPONS, riniciar_dados
+from dados import CUPONS, reiniciar_dados
 from main import app
 
 senhas = {
@@ -72,9 +72,24 @@ def cadastrar(_client, headers_admin, novo_cupom):
     """Fixture para cadastrar um cupom e retornar o cupom cadastrado."""
     
     def _cadastrar(**campos) -> dict:
-        corpo = novo_cupom(**campos)
-        resp = _client.post("/cupons", json=corpo, headers=headers_admin)
+        resp = _client.post("/cupons", json=novo_cupom(**campos), headers=headers_admin)
         assert resp.status_code == 201, f"Falha ao cadastrar cupom: {resp.text}"
         return resp.json()
     
     return _cadastrar
+
+
+@pytest.fixture
+def ontem() -> str:
+    """Retorna a data de ontem no formato ISO."""
+    return (date.today() - timedelta(days=1)).isoformat()
+
+
+@pytest.fixture
+def snapshot_cupons():
+    """Devolve uma função que tira 'foto' independente do catálogo atual.
+    
+    Útil para provar que operações regeitadas NÃO alteram nenhum registro.
+    """
+    from copy import deepcopy
+    return lambda: deepcopy(CUPONS)
